@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Rooms - Collaborative Music</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'rooms/css/rooms_home.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">🎵 Music Rooms</div>
+            <div class="nav-links">
+                <a href="/profile/">Profile</a>
+                <a href="#" id="logoutLink">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div id="alert" class="alert"></div>
+        
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>🚀 Quick Actions</h2>
+            <div class="actions">
+                <div class="action-card">
+                    <h3>🎵 Create Room</h3>
+                    <p>Start a new music room and invite friends</p>
+                    <button class="btn btn-success" onclick="showCreateForm()">Create Room</button>
+                </div>
+                
+                <div class="action-card">
+                    <h3>🔗 Join Room</h3>
+                    <p>Enter a room code to join an existing session</p>
+                    <div class="join-form">
+                        <input type="text" id="roomCode" placeholder="ROOM CODE" maxlength="6">
+                        <button class="btn btn-primary" onclick="joinRoom()">Join</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Create Room Form (Hidden by default) -->
+        <div class="section" id="createRoomSection" style="display: none;">
+            <h2>🎵 Create New Room</h2>
+            <form id="createRoomForm">
+                <div class="form-group">
+                    <label for="roomName">Room Name *</label>
+                    <input type="text" id="roomName" required placeholder="My Awesome Music Room">
+                </div>
+                
+                <div class="form-group">
+                    <label for="roomDescription">Description</label>
+                    <textarea id="roomDescription" rows="3" placeholder="Tell people what this room is about..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxParticipants">Max Participants</label>
+                        <select id="maxParticipants">
+                            <option value="5">5 people</option>
+                            <option value="10" selected>10 people</option>
+                            <option value="20">20 people</option>
+                            <option value="50">50 people</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Room Settings</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="isPublic" checked>
+                            <label for="isPublic">Public (anyone can join)</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="allowGuestControl" checked>
+                            <label for="allowGuestControl">Guests can add songs</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">🎵 Create Room</button>
+                    <button type="button" class="btn btn-primary" onclick="hideCreateForm()" style="margin-left: 10px;">Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- User's Rooms -->
+        <div class="section">
+            <h2>🎵 Your Rooms</h2>
+            <div id="roomsLoading" class="loading">
+                <p>Loading your rooms...</p>
+            </div>
+            <div id="roomsContainer" class="rooms-grid" style="display: none;"></div>
+            <div id="roomsEmpty" class="empty-state" style="display: none;">
+                <p>You don't have any rooms yet. Create one to get started! 🎵</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{% static 'rooms/js/rooms_home.js' %}"></script>
+</body>
+</html>

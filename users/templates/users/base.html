@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Music Room{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card h1, .card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 300;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input[type="email"], 
+        input[type="password"], 
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="email"]:focus, 
+        input[type="password"]:focus, 
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert-success {
+            background-color: #efe;
+            color: #393;
+            border: 1px solid #cfc;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 25px;
+        }
+        
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .link a:hover {
+            color: #764ba2;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .navbar .brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .navbar .nav-links a {
+            margin-left: 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .navbar .nav-links a:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .user-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    {% block navbar %}{% endblock %}
+    
+    <div class="container">
+        <div class="card">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    
+    <script>
+        // Utility functions for token management
+        const TokenManager = {
+            setTokens(accessToken, refreshToken) {
+                localStorage.setItem('access_token', accessToken);
+                localStorage.setItem('refresh_token', refreshToken);
+            },
+            
+            getAccessToken() {
+                return localStorage.getItem('access_token');
+            },
+            
+            getRefreshToken() {
+                return localStorage.getItem('refresh_token');
+            },
+            
+            clearTokens() {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user_data');
+            },
+            
+            setUserData(userData) {
+                localStorage.setItem('user_data', JSON.stringify(userData));
+            },
+            
+            getUserData() {
+                const userData = localStorage.getItem('user_data');
+                return userData ? JSON.parse(userData) : null;
+            },
+            
+            isAuthenticated() {
+                return !!this.getAccessToken();
+            }
+        };
+        
+        // API helper function
+        async function apiCall(endpoint, method = 'GET', data = null, requiresAuth = false) {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            if (requiresAuth) {
+                const token = TokenManager.getAccessToken();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+            }
+            
+            const config = {
+                method,
+                headers
+            };
+            
+            if (data) {
+                config.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(endpoint, config);
+            
+            if (response.status === 401 && requiresAuth) {
+                // Token expired, redirect to login
+                TokenManager.clearTokens();
+                window.location.href = '/login/';
+                return;
+            }
+            
+            return response;
+        }
+        
+        // Show/hide alerts
+        function showAlert(message, type = 'error') {
+            const alertDiv = document.getElementById('alert');
+            if (alertDiv) {
+                alertDiv.textContent = message;
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.style.display = 'block';
+                
+                if (type === 'success') {
+                    setTimeout(() => {
+                        alertDiv.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        }
+        
+        // Check authentication status on protected pages
+        function checkAuth() {
+            if (window.location.pathname === '/profile/' && !TokenManager.isAuthenticated()) {
+                window.location.href = '/login/';
+            }
+        }
+        
+        // Run auth check on page load
+        document.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

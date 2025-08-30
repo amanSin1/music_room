@@ -1,0 +1,135 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Profile - Music Room{% endblock %}
+
+{% block navbar %}
+<nav class="navbar">
+    <div class="container">
+        <div class="brand">🎵 Music Room</div>
+        <div class="nav-links">
+            <a href="/profile/">Profile</a>
+            <a href="#" id="logoutLink">Logout</a>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+    <div id="alert" class="alert"></div>
+    
+    <div id="loading" style="text-align: center;">
+        <p>Loading profile...</p>
+    </div>
+    
+    <div id="profile-content" style="display: none;">
+        <h2>🎵 Your Profile</h2>
+        
+        <div class="user-info">
+            <h3 id="userName">Loading...</h3>
+            <p><strong>Email:</strong> <span id="userEmail">Loading...</span></p>
+            <p><strong>User ID:</strong> <span id="userId">Loading...</span></p>
+            <p><strong>Member since:</strong> <span id="memberSince">Today</span></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-primary" onclick="refreshProfile()" style="margin-right: 10px;">
+                Refresh Profile
+            </button>
+            <button class="btn btn-danger" onclick="logout()">
+                Logout
+            </button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/rooms/" class="btn btn-primary" style="display: inline-block; text-decoration: none; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                🎵 Go to Music Rooms
+            </a>
+        </div>
+    </div>
+    
+    <div id="login-prompt" style="display: none; text-align: center;">
+        <h2>Please Login</h2>
+        <p>You need to be logged in to view your profile.</p>
+        <a href="/login/" class="btn btn-primary" style="display: inline-block; text-decoration: none; margin-top: 20px;">
+            Login
+        </a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let profileData = null;
+    
+    async function loadProfile() {
+        const loading = document.getElementById('loading');
+        const profileContent = document.getElementById('profile-content');
+        const loginPrompt = document.getElementById('login-prompt');
+        
+        if (!TokenManager.isAuthenticated()) {
+            loading.style.display = 'none';
+            loginPrompt.style.display = 'block';
+            return;
+        }
+        
+        try {
+            const response = await apiCall('/api/profile/', 'GET', null, true);
+            
+            if (response.ok) {
+                profileData = await response.json();
+                
+                // Update UI with profile data
+                document.getElementById('userName').textContent = profileData.name;
+                document.getElementById('userEmail').textContent = profileData.email;
+                document.getElementById('userId').textContent = profileData.id;
+                
+                // Update stored user data
+                TokenManager.setUserData(profileData);
+                
+                loading.style.display = 'none';
+                profileContent.style.display = 'block';
+            } else if (response.status === 401) {
+                // Token expired
+                TokenManager.clearTokens();
+                loading.style.display = 'none';
+                loginPrompt.style.display = 'block';
+            } else {
+                throw new Error('Failed to load profile');
+            }
+        } catch (error) {
+            console.error('Profile loading error:', error);
+            showAlert('Failed to load profile. Please try again.', 'error');
+            loading.style.display = 'none';
+            loginPrompt.style.display = 'block';
+        }
+    }
+    
+    async function refreshProfile() {
+        showAlert('Refreshing profile...', 'success');
+        await loadProfile();
+    }
+    
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            TokenManager.clearTokens();
+            showAlert('Logged out successfully!', 'success');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load profile on page load
+        loadProfile();
+        
+        // Setup logout link
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+    });
+</script>
+{% endblock %}

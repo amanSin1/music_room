@@ -1,0 +1,60 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Logout - Music Room{% endblock %}
+
+{% block content %}
+    <div id="alert" class="alert"></div>
+    
+    <h2>🎵 Logout</h2>
+    
+    <div style="text-align: center;">
+        <p style="margin-bottom: 30px; color: #666;">
+            Are you sure you want to logout?
+        </p>
+        
+        <button class="btn btn-danger" onclick="confirmLogout()" style="margin-right: 10px;">
+            Yes, Logout
+        </button>
+        
+        <a href="/profile/" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+            Cancel
+        </a>
+    </div>
+    
+    <div id="logged-out" style="display: none; text-align: center;">
+        <h3>✅ Logged Out Successfully</h3>
+        <p style="margin: 20px 0; color: #666;">
+            You have been logged out of Music Room.
+        </p>
+        
+        <a href="/" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+            Return Home
+        </a>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function confirmLogout() {
+        // Clear all tokens and user data
+        TokenManager.clearTokens();
+        
+        // Show success message
+        showAlert('Logged out successfully!', 'success');
+        
+        // Hide logout form and show success message
+        document.querySelector('.card > div:first-child').style.display = 'none';
+        document.getElementById('logged-out').style.display = 'block';
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 2000);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // If not authenticated, redirect to home
+        if (!TokenManager.isAuthenticated()) {
+            window.location.href = '/';
+        }
+    });

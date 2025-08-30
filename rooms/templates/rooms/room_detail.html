@@ -1,0 +1,188 @@
+{% comment %} rooms\templates\rooms\room_detail.html {% endcomment %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music Room - {{ room_code }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'rooms/css/room_detail.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">🎵 Music Room</div>
+            <div class="nav-links">
+                <a href="/rooms/">← Back to Rooms</a>
+                <a href="/profile/">Profile</a>
+                <a href="#" id="logoutLink">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Connection Status Indicator -->
+    <div id="connectionStatus" class="connection-status connection-connecting">
+        Connecting...
+    </div>
+    
+    <div class="container">
+        <div id="alert" class="alert"></div>
+        
+        <div id="loading" class="loading">
+            <p>Loading room...</p>
+        </div>
+        
+        <div id="roomContent" style="display: none;">
+            <!-- Room Header -->
+            <div class="room-header">
+                <div class="room-code" id="roomCodeDisplay">{{ room_code }}</div>
+                <div class="room-info">
+                    <h1 id="roomName">Loading...</h1>
+                    <p id="roomDescription"></p>
+                </div>
+                <div class="room-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="participantCount">0</div>
+                        <div class="stat-label">Participants</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="roomStatus">Active</div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="yourRole">Guest</div>
+                        <div class="stat-label">Your Role</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Player Section -->
+                <div class="player-section">
+    <div class="section-header">
+        <h3>🎵 Now Playing</h3>
+    </div>
+    <div class="section-content">
+        <div class="current-song">
+            <div id="noSong" class="no-song">
+                <p>🎵 No song is currently playing</p>
+                <p style="margin-top: 10px; font-size: 14px;">Add a song to get the party started!</p>
+            </div>
+            
+            <div id="songPlaying" style="display: none;">
+                <!-- Hidden audio element for actual playback -->
+                <audio id="audioPlayer" preload="auto">
+                    Your browser does not support the audio element.
+                </audio>
+                
+                <div class="song-info">
+                    <div class="song-title" id="songTitle">Song Title</div>
+                    <div class="song-artist" id="songArtist">Artist Name</div>
+                </div>
+                
+                <div class="playback-controls">
+                    <button class="control-btn" id="prevBtn">⏮️</button>
+                    <button class="control-btn" id="playPauseBtn">▶️</button>
+                    <button class="control-btn" id="nextBtn">⏭️</button>
+                </div>
+                
+                <div class="progress-bar" id="progressContainer">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="time-info">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Song Queue Section -->
+        <div id="queueSection" style="margin-top: 20px; display: none;">
+            <h4>Queue</h4>
+            <div id="queueList" class="queue-list">
+                <!-- Queue items will be added here -->
+            </div>
+        </div>
+        
+        <!-- Add Song Button -->
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-primary" onclick="showAddSong()">
+                ➕ Add Song to Queue
+            </button>
+        </div>
+    </div>
+</div>
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Participants -->
+                    <div class="section-header">
+                        <h3>👥 Participants</h3>
+                    </div>
+                    <div class="section-content">
+                        <div id="participantsList" class="participants-list">
+                            <!-- Participants will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Room Actions -->
+                    <div class="section-header" style="border-top: 1px solid #e9ecef;">
+                        <h3>⚙️ Actions</h3>
+                    </div>
+                    <div class="section-content">
+                        <div style="text-align: center;">
+                            <button class="btn btn-primary" onclick="copyRoomLink()" style="margin-bottom: 10px; width: 100%;">
+                                📋 Copy Room Link
+                            </button>
+                            <button class="btn btn-danger" onclick="leaveRoom()" style="width: 100%;">
+                                🚪 Leave Room
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="errorState" style="display: none; text-align: center; padding: 40px;">
+            <h2>🚫 Room Not Found</h2>
+            <p>This room doesn't exist or you don't have access to it.</p>
+            <a href="/rooms/" class="btn btn-primary" style="margin-top: 20px;">← Back to Rooms</a>
+        </div>
+    </div>
+    <!-- Add Song Modal -->
+<div id="addSongModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Song</h3>
+            <span class="close" onclick="closeAddSongModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="songTitleInput">Song Title:</label>
+                <input type="text" id="songTitleInput" placeholder="Enter song title" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="artistInput">Artist:</label>
+                <input type="text" id="artistInput" placeholder="Enter artist name" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="songUrlInput">Song URL (MP3 link or YouTube):</label>
+                <input type="url" id="songUrlInput" placeholder="https://example.com/song.mp3" class="form-input">
+                <small>For now, provide direct MP3 links. YouTube integration coming soon!</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeAddSongModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="addSongToQueue()">Add Song</button>
+        </div>
+    </div>
+</div>
+    
+    <!-- Pass room code to JavaScript -->
+    <script>
+        window.ROOM_CODE = '{{ room_code }}';
+    </script>
+    <script src="{% static 'rooms/js/room_detail.js' %}"></script>
+</body>
+</html>
